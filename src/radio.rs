@@ -43,13 +43,28 @@ pub enum ConfigOption {
     IPv4([u8; 4]),
     /// IPv6 address
     IPv6([u8; 16]),
+
+    /// IEEE802.15.4(g) / ZigBee address options
+    /// Short (16-bit) Address
+    ShortAddress(u16),
+    /// Long (64-bit) Address
+    LongAddress(u64),
+    /// PAN ID
+    PAN(u16),
+
+    /// Maximum Transmission Unit (MTU)
+    MTU(u16),
     /// Transmit power (dBm)
     TXPower(i16),
+
+
     /// Await Clear Channel before TX (if supported)
     AwaitCCA(bool),
-    /// Automatic Acknowledgement (if supported)
+    /// CCA threshold in dBm (used if AwaitCCA is set)
+    CCAThreshold(i16),
+    /// Automatic Acknowledgement (if supported) sends 802.15.4 acknowledgements automatically
     AutoAck(bool),
-    /// Promiscuous mode (if supported)
+    /// Promiscuous mode (if supported) disables hardware address filtering
     Promiscuous(bool),
 }
 
@@ -62,6 +77,7 @@ pub trait Configure {
     fn set_option(&mut Self, o: &ConfigOption) -> nb::Result<(), Self::Error>;
 
     /// Fetch a configuration option
+    /// This will overwrite the value of the provided option enum
     fn get_option(&mut Self, o: &mut ConfigOption) -> nb::Result<(), Self::Error>;
 }
 
@@ -79,8 +95,8 @@ pub trait Send {
 /// Default packet information structure
 #[derive(Debug)]
 pub struct Info {
-    rssi:   i16,  // RSSI of received packet
-    lqi:    u16   // LQI of received packet
+    rssi:   i16,  // Received Signal Strength Indicator (RSSI) of received packet in dBm
+    lqi:    u16   // Link Quality Indicator (LQI) of received packet
 }
 
 /// Receive trait for radios that can receive packets
@@ -106,12 +122,22 @@ pub enum Event {
     ChannelHop(u16),
     /// Transmission completed
     TXComplete,
-    /// CCA transmit timeout
-    CCATimeout,
+    /// No ack for transmission
+    TXErrorNoAck,
+    /// CCA timeout attempting transmission
+    TXErrorCCATimeout,
+    /// Generic transmission error
+    TXError(isize),
+    /// Started receiving a packet
+    RXStart,
     /// Packet received
     RXComplete,
-    /// Receive Error
-    RXError,
+    /// Receive CRC error
+    RXErrorCRC,
+    /// Receive timeout
+    RXErrorTimeout,
+    /// Generic receive error
+    RXError(isize),
 }
 
 /// Async trait implemented by radios with interrupt driven state changes
