@@ -1,0 +1,141 @@
+//! Radio
+
+use nb;
+
+extern crate std;
+use self::std::boxed::Box;
+
+/// Basic radio states
+pub enum State {
+    /// Radio powered off
+    OFF             = 0,
+    /// Radio IDLE (awaiting commands)    
+    IDLE            = 1,
+    /// Radio sleeping (low power mode)    
+    SLEEP           = 2,
+    /// In receive mode (not receiving)
+    RECEIVE         = 3,
+    /// In receive mode (receiving)
+    RECEIVING       = 4,
+    /// Currently transmitting
+    TRANSMITTING    = 5
+}
+
+/// Radio trait combines Base, Configure, Send and Receive for a generic radio object
+pub trait Radio: Base + Configure + Send + Receive {}
+
+/// Base radio traits
+pub trait Base {
+    /// Radio error
+    type Error;
+
+    /// Fetch the current radio state
+    fn get_state(&mut Self) -> nb::Result<State, Self::Error>;
+    /// Set the ratio state
+    fn set_state(&mut Self, State) -> nb::Result<State, Self::Error>;
+}
+
+/// Basic radio options
+pub enum ConfigOption {
+    /// MAC address
+    MAC([u8; 6]),
+    /// IPv4 address
+    IPv4([u8; 4]),
+    /// IPv6 address
+    IPv6([u8; 16]),
+    /// Transmit power (dBm)
+    TXPower(i16),
+    /// Await Clear Channel before TX (if supported)
+    AwaitCCA(bool),
+    /// Automatic Acknowledgement (if supported)
+    AutoAck(bool),
+    /// Promiscuous mode (if supported)
+    Promiscuous(bool),
+}
+
+/// Configure trait implemented by configurable radios
+pub trait Configure {
+    /// Radio error
+    type Error;
+
+    /// Set a configuration option
+    fn set_option(&mut Self, o: &ConfigOption) -> nb::Result<(), Self::Error>;
+
+    /// Fetch a configuration option
+    fn get_option(&mut Self, o: &mut ConfigOption) -> nb::Result<(), Self::Error>;
+}
+
+/// Send trait for radios that can transmit packets
+pub trait Send {
+    /// Radio error
+    type Error;
+
+    /// Start sending a packet on the provided channel
+    fn start_send(&mut Self, channel: u16, data: &[u8]) -> nb::Result<State, Self::Error>;
+    /// Check for send completion
+    fn check_send(&mut Self) -> nb::Result<State, Self::Error>;
+}
+
+/// Default packet information structure
+#[derive(Debug)]
+pub struct Info {
+    rssi:   i16,  // RSSI of received packet
+    lqi:    u16   // LQI of received packet
+}
+
+/// Receive trait for radios that can receive packets
+pub trait Receive {
+    /// Radio error
+    type Error;
+
+    /// Set receiving on the specified channel
+    fn start_receive(&mut Self, channel: u16) -> nb::Result<State, Self::Error>;
+    /// Fetch a received packet if rx is complete
+    fn get_received<'a>(&mut Self) -> nb::Result<Option<(&'a[u8], Info)>, Self::Error>;
+
+    /// Fetch the current RSSI value from the radio
+    fn get_rssi(&mut Self) -> nb::Result<i16, Self::Error>;
+}
+
+
+/// Events for async callbacks
+pub enum Event {
+    /// Radio state changed event
+    StateChange(State),
+    /// Channel hop event
+    ChannelHop(u16),
+    /// Transmission completed
+    TXComplete,
+    /// CCA transmit timeout
+    CCATimeout,
+    /// Packet received
+    RXComplete,
+    /// Receive Error
+    RXError,
+}
+
+/// Async trait implemented by radios with interrupt driven state changes
+/// This callback should only be called on interrupt events (not due to )
+pub trait Async<T> {
+    /// Set radio event callback
+    /// Called when radio state changes, packets finish sending etc. to handle async / interrupt driven state changes
+    fn set_callback<CB: 'static + FnMut(T, Event)>(&mut self, callback: CB);
+}
+
+/// AsyncHelper provides callback binding and calling helpers for radio implementations
+pub struct AsyncHelper<T> {
+    callback: Box<FnMut(T, Event)>
+}
+
+impl <T> Async<T> for AsyncHelper<T> {
+    fn set_callback<CB: 'static + FnMut(T, Event)>(&mut self, c: CB) {
+        self.callback = Box::new(c);
+    }
+}
+
+impl <T> AsyncHelper<T> {
+    /// Execute the bound callback in the sync helper
+    pub fn do_callback(&mut self, ctx: T, e: Event) {
+        (self.callback)(ctx, e);
+    }
+}
