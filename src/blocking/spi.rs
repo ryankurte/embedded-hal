@@ -64,3 +64,53 @@ pub mod write {
         }
     }
 }
+
+
+struct Transaction<'a, S: 'a, E> {
+    spi: &'a S,
+    error: Option<E>,
+}
+
+pub trait Transact<W> {
+    type Error;
+
+    fn read(self, &mut [W]) -> Self;
+    fn write(self, &[W]) -> Self;
+    fn end(self) -> Result<(), Self::Error>;
+}
+
+impl <'a, S, E, W>Transact<W> for Transaction<'a, S, E> 
+where
+    S: ::spi::FullDuplex<W>,
+    W: Clone,
+{
+    type Error = S::Error;
+
+    fn write(self, data: &[W]) -> Self {
+        if let Some(e) = self.error {
+            return self;
+        }
+
+        // write from data
+
+        self
+    }
+    fn read(self, data: &mut [W]) -> Self {
+        if let Some(e) = self.error {
+            return self;
+        }
+
+        // read into data
+
+        self
+    }
+
+    fn end(self) -> Result<(), Self::Error> {
+        // de-assert
+
+        match self.error {
+            Some(e) => Err(e),
+            None => Ok(())
+        }
+    }
+}
