@@ -61,17 +61,17 @@ pub trait StatefulOutputPin {
 }
 
 /// Implementation of v0.3 fallible StatefulOutputPin for v0.2 traits
-#[cfg(feature = "unproven")]
+#[cfg(feature = "not-sure-how")]
 impl hal_v03::digital::StatefulOutputPin for StatefulOutputPin
 {
     type Error = ();
 
     /// Toggle pin output
-    fn is_set_low(&mut self) -> Result<(), Self::Error> {
+    fn is_set_low(&self) -> Result<(), Self::Error> {
         Ok(self.is_set_low())
     }
 
-     fn is_set_high(&mut self) -> Result<(), Self::Error> {
+     fn is_set_high(&self) -> Result<(), Self::Error> {
          Ok(self.is_set_high())
      }
 }
@@ -80,11 +80,11 @@ impl hal_v03::digital::StatefulOutputPin for StatefulOutputPin
 /// Implementation of v0.2 StatefulOutputPin trait for v0.3 fallible pins
 #[cfg(feature = "unproven")]
 impl StatefulOutputPin for hal_v03::digital::StatefulOutputPin<Error=()> {
-    fn is_set_low(&mut self) {
+    fn is_set_low(&self) -> bool {
         self.is_set_low().unwrap()
     }
 
-    fn is_set_high(&mut self) {
+    fn is_set_high(&self) -> bool {
         self.is_set_high().unwrap()
     }
 }
@@ -185,11 +185,11 @@ impl hal_v03::digital::InputPin for InputPin
     type Error = ();
 
     /// Toggle pin output
-    fn is_low(&mut self) -> Result<(), Self::Error> {
+    fn is_low(&self) -> Result<bool, Self::Error> {
         Ok(self.is_low())
     }
 
-     fn is_high(&mut self) -> Result<(), Self::Error> {
+     fn is_high(&self) -> Result<bool, Self::Error> {
          Ok(self.is_high())
      }
 }
@@ -198,11 +198,11 @@ impl hal_v03::digital::InputPin for InputPin
 /// Implementation of v0.2 InputPin trait for v0.3 fallible pins
 #[cfg(feature = "unproven")]
 impl InputPin for hal_v03::digital::InputPin<Error=()> {
-    fn is_low(&mut self) {
+    fn is_low(&self) -> bool {
         self.is_low().unwrap()
     }
 
-    fn is_high(&mut self) {
+    fn is_high(&self) -> bool {
         self.is_high().unwrap()
     }
 }
