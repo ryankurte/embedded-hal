@@ -1,5 +1,7 @@
 //! Digital I/O
 
+extern crate embedded_hal as hal_v03;
+
 /// Single digital push-pull output pin
 pub trait OutputPin {
     /// Drives the pin low
@@ -15,6 +17,33 @@ pub trait OutputPin {
     fn set_high(&mut self);
 }
 
+/// Implementation of v0.3 fallible OutputPin for v0.2 traits
+impl hal_v03::digital::OutputPin for OutputPin
+{
+    type Error = ();
+
+    /// Toggle pin output
+    fn set_low(&mut self) -> Result<(), Self::Error> {
+        Ok(self.set_low())
+    }
+
+     fn set_high(&mut self) -> Result<(), Self::Error> {
+         Ok(self.set_high())
+     }
+}
+
+/// Implementation of v0.2 OutputPin trait for v0.3 fallible output pins
+impl OutputPin for hal_v03::digital::OutputPin<Error=()> {
+    fn set_low(&mut self) {
+        self.set_low().unwrap()
+    }
+
+    fn set_high(&mut self) {
+        self.set_high().unwrap()
+    }
+}
+
+
 /// Push-pull output pin that can read its output state
 ///
 /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
@@ -29,6 +58,35 @@ pub trait StatefulOutputPin {
     ///
     /// *NOTE* this does *not* read the electrical state of the pin
     fn is_set_low(&self) -> bool;
+}
+
+/// Implementation of v0.3 fallible StatefulOutputPin for v0.2 traits
+#[cfg(feature = "unproven")]
+impl hal_v03::digital::StatefulOutputPin for StatefulOutputPin
+{
+    type Error = ();
+
+    /// Toggle pin output
+    fn is_set_low(&mut self) -> Result<(), Self::Error> {
+        Ok(self.is_set_low())
+    }
+
+     fn is_set_high(&mut self) -> Result<(), Self::Error> {
+         Ok(self.is_set_high())
+     }
+}
+
+
+/// Implementation of v0.2 StatefulOutputPin trait for v0.3 fallible pins
+#[cfg(feature = "unproven")]
+impl StatefulOutputPin for hal_v03::digital::StatefulOutputPin<Error=()> {
+    fn is_set_low(&mut self) {
+        self.is_set_low().unwrap()
+    }
+
+    fn is_set_high(&mut self) {
+        self.is_set_high().unwrap()
+    }
 }
 
 /// Output pin that can be toggled
@@ -118,4 +176,33 @@ pub trait InputPin {
 
     /// Is the input pin low?
     fn is_low(&self) -> bool;
+}
+
+/// Implementation of v0.3 fallible InputPin for v0.2 traits
+#[cfg(feature = "unproven")]
+impl hal_v03::digital::InputPin for InputPin
+{
+    type Error = ();
+
+    /// Toggle pin output
+    fn is_low(&mut self) -> Result<(), Self::Error> {
+        Ok(self.is_low())
+    }
+
+     fn is_high(&mut self) -> Result<(), Self::Error> {
+         Ok(self.is_high())
+     }
+}
+
+
+/// Implementation of v0.2 InputPin trait for v0.3 fallible pins
+#[cfg(feature = "unproven")]
+impl InputPin for hal_v03::digital::InputPin<Error=()> {
+    fn is_low(&mut self) {
+        self.is_low().unwrap()
+    }
+
+    fn is_high(&mut self) {
+        self.is_high().unwrap()
+    }
 }

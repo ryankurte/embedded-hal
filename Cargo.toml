@@ -20,6 +20,11 @@ version = "1.0.2"
 [dependencies.nb]
 version = "0.1.1"
 
+[dependencies.embedded-hal]
+version= "0.3.0"
+path = "../new"
+features = ["unproven"]
+
 [dev-dependencies]
 stm32f30x = "0.6.0"
 futures = "0.1.17"
