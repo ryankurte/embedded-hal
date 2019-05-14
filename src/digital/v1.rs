@@ -67,8 +67,8 @@ pub trait ToggleableOutputPin {
 /// `digital::v2::toggleable`*.
 ///
 /// ```
-/// use embedded_hal::digital::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
-/// use embedded_hal::digital::toggleable;
+/// use embedded_hal::digital::v1::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
+/// use embedded_hal::digital::v1::toggleable;
 ///
 /// /// A virtual output pin that exists purely in software
 /// struct MyPin {
@@ -105,7 +105,7 @@ pub trait ToggleableOutputPin {
 #[cfg(feature = "unproven")]
 pub mod toggleable {
     #[allow(deprecated)]
-    use super::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
+    use crate::digital::v1::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
 
     /// Software-driven `toggle()` implementation.
     ///
