@@ -11,7 +11,11 @@ license = "MIT OR Apache-2.0"
 name = "embedded-hal"
 readme = "README.md"
 repository = "https://github.com/japaric/embedded-hal"
-version = "0.2.3"
+version = "0.2.4"
+
+
+[dependencies]
+embedded-hal-v3 = { package = "embedded-hal", version = "0.3.0", features= ["unproven"], path = "../embedded-hal-v0.3.x" }
 
 [dependencies.void]
 default-features = false
@@ -29,3 +33,6 @@ unproven = ["nb/unstable"]
 
 [package.metadata.docs.rs]
 features = ["unproven"]
+
+#[patch.crates-io]
+#embedded-hal = { path = "../embedded-hal-v0.3.x" }
