@@ -5,7 +5,7 @@ pub trait Transfer<W> {
     /// Error type
     type Error;
 
-    /// Sends `words` to the slave. Returns the `words` received from the slave
+    /// Sends `words` to the device. Returns the `words` received from the device
     fn transfer<'w>(&mut self, words: &'w mut [W]) -> Result<&'w [W], Self::Error>;
 }
 
@@ -18,13 +18,23 @@ pub trait Write<W> {
     fn write(&mut self, words: &[W]) -> Result<(), Self::Error>;
 }
 
+/// Blocking WriteRead
+#[cfg(feature = "unproven")]
+pub trait WriteRead<W> {
+    /// Error type
+    type Error;
+
+    /// Writes `outgoing` to the device _then_ reads `incoming` in response
+    fn write_read<'w>(&mut self, outgoing: &[W], incoming: &'w mut [W]) -> Result<&'w [W], Self::Error>;
+}
+
 /// Blocking write (iterator version)
 #[cfg(feature = "unproven")]
 pub trait WriteIter<W> {
     /// Error type
     type Error;
 
-    /// Sends `words` to the slave, ignoring all the incoming words
+    /// Sends `words` to the device, ignoring all the incoming words
     fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
     where
         WI: IntoIterator<Item = W>;
