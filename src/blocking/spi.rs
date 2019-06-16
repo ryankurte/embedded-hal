@@ -24,7 +24,7 @@ pub trait WriteRead<W> {
     /// Error type
     type Error;
 
-    /// Writes `outgoing` to the device _then_ reads `incoming` in response
+    /// Sends `outgoing` to the device _then_ reads and returns `incoming` response from the device
     fn write_read<'w>(&mut self, outgoing: &[W], incoming: &'w mut [W]) -> Result<&'w [W], Self::Error>;
 }
 
