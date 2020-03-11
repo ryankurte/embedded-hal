@@ -749,7 +749,7 @@ pub mod watchdog;
 /// #     fn set_resolution<T>(&mut self, _: T) where T: Into<MilliSeconds> {}
 /// # }
 /// ```
-#[cfg(feature = "unproven")]
+
 // reason: pre-singletons API. With singletons a `CapturePin` (cf. `PwmPin`) trait seems more
 // appropriate
 pub trait Capture {
@@ -843,7 +843,7 @@ pub trait Capture {
 /// #     fn set_period<T>(&mut self, _: T) where T: Into<KiloHertz> {}
 /// # }
 /// ```
-#[cfg(feature = "unproven")]
+
 // reason: pre-singletons API. The `PwmPin` trait seems more useful because it models independent
 // PWM channels. Here a certain number of channels are multiplexed in a single implementer.
 pub trait Pwm {
@@ -964,7 +964,7 @@ pub trait PwmPin {
 /// #     fn wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
 /// # }
 /// ```
-#[cfg(feature = "unproven")]
+
 // reason: needs to be re-evaluated in the new singletons world. At the very least this needs a
 // reference implementation
 pub trait Qei {
@@ -982,7 +982,7 @@ pub trait Qei {
 ///
 /// *This enumeration is available if embedded-hal is built with the `"unproven"` feature.*
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-#[cfg(feature = "unproven")]
+
 // reason: part of the unproven `Qei` interface
 pub enum Direction {
     /// 3, 2, 1

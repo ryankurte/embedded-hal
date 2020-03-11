@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - The current versions of `InputPin` have been proven. These are `digital::v1::InputPin` 
   and `digital::v2::InputPin`.
+- Removed all unproven markers (and the unproven feature)
 
 ## [v0.2.3] - 2019-05-09
 

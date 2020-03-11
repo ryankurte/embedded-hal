@@ -89,7 +89,7 @@ where
 
 /// Implementation of `v1::StatefulOutputPin` trait for `v2::StatefulOutputPin` fallible pins
 /// where errors will panic.
-#[cfg(feature = "unproven")]
+
 #[allow(deprecated)]
 impl<T, E> v1::StatefulOutputPin for OldOutputPin<T>
 where

@@ -56,7 +56,7 @@ where
 }
 
 /// Implementation of fallible `v2::StatefulOutputPin` for `v1::StatefulOutputPin` digital traits
-#[cfg(feature = "unproven")]
+
 #[allow(deprecated)]
 impl<T> v2::StatefulOutputPin for T
 where
@@ -71,7 +71,7 @@ where
     }
 }
 
-#[cfg(feature = "unproven")]
+
 #[allow(deprecated)]
 impl<T> v2::toggleable::Default for T where T: v1::toggleable::Default {}
 
@@ -114,7 +114,7 @@ mod tests {
         }
     }
 
-    #[cfg(feature = "unproven")]
+    
     #[allow(deprecated)]
     impl v1::StatefulOutputPin for OldOutputPinImpl {
         fn is_set_low(&self) -> bool {
@@ -126,7 +126,7 @@ mod tests {
         }
     }
 
-    #[cfg(feature = "unproven")]
+    
     #[allow(deprecated)]
     impl v1::toggleable::Default for OldOutputPinImpl {}
 
@@ -143,12 +143,12 @@ mod tests {
         }
     }
 
-    #[cfg(feature = "unproven")]
+    
     struct NewToggleablePinConsumer<T: v2::ToggleableOutputPin> {
         _pin: T,
     }
 
-    #[cfg(feature = "unproven")]
+    
     impl<T> NewToggleablePinConsumer<T>
     where
         T: v2::ToggleableOutputPin,
@@ -158,7 +158,7 @@ mod tests {
         }
     }
 
-    #[cfg(feature = "unproven")]
+    
     #[test]
     fn v2_v1_toggleable_implicit() {
         let i = OldOutputPinImpl { state: false };

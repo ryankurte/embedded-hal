@@ -23,7 +23,7 @@ pub trait OutputPin {
 /// Push-pull output pin that can read its output state
 ///
 /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
-#[cfg(feature = "unproven")]
+
 pub trait StatefulOutputPin: OutputPin {
     /// Is the pin in drive high mode?
     ///
@@ -44,7 +44,7 @@ pub trait StatefulOutputPin: OutputPin {
 /// both [OutputPin](trait.OutputPin.html) and
 /// [StatefulOutputPin](trait.StatefulOutputPin.html) are
 /// implemented. Otherwise, implement this using hardware mechanisms.
-#[cfg(feature = "unproven")]
+
 pub trait ToggleableOutputPin {
     /// Error type
     type Error;
@@ -97,7 +97,7 @@ pub trait ToggleableOutputPin {
 /// pin.toggle().unwrap();
 /// assert!(pin.is_set_low().unwrap());
 /// ```
-#[cfg(feature = "unproven")]
+
 pub mod toggleable {
     use super::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
 

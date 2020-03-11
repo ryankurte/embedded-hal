@@ -30,7 +30,7 @@ pub trait OutputPin {
 ///
 /// *This version of the trait is now deprecated. Please use the new `StatefulOutputPin` trait in
 /// `digital::v2::StatefulOutputPin`*.
-#[cfg(feature = "unproven")]
+
 pub trait StatefulOutputPin {
     /// Is the pin in drive high mode?
     ///
@@ -54,7 +54,7 @@ pub trait StatefulOutputPin {
 /// both [OutputPin](trait.OutputPin.html) and
 /// [StatefulOutputPin](trait.StatefulOutputPin.html) are
 /// implemented. Otherwise, implement this using hardware mechanisms.
-#[cfg(feature = "unproven")]
+
 pub trait ToggleableOutputPin {
     /// Toggle pin output.
     fn toggle(&mut self);
@@ -102,7 +102,7 @@ pub trait ToggleableOutputPin {
 /// pin.toggle();
 /// assert!(pin.is_set_low());
 /// ```
-#[cfg(feature = "unproven")]
+
 pub mod toggleable {
     #[allow(deprecated)]
     use super::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
