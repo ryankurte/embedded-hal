@@ -108,7 +108,6 @@ pub mod write_iter {
 /// Operation for transactional SPI trait
 ///
 /// This allows composition of SPI operations into a single bus transaction
-#[cfg(feature = "unproven")]
 #[derive(Debug, PartialEq)]
 pub enum Operation<'a, W: 'static> {
     /// Write data from the provided buffer, discarding read data
@@ -119,7 +118,6 @@ pub enum Operation<'a, W: 'static> {
 
 /// Transactional trait allows multiple actions to be executed
 /// as part of a single SPI transaction
-#[cfg(feature = "unproven")]
 pub trait Transactional<W: 'static> {
     /// Associated error type
     type Error;
