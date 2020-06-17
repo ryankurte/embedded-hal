@@ -125,3 +125,31 @@ pub trait Transactional<W: 'static> {
     /// Execute the provided transactions
     fn exec<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error>;
 }
+
+/// Blocking transactional impl over spi::Write and spi::Transfer
+pub mod transactional {
+    use super::{Operation, Transfer, Write};
+
+    /// Default implementation of `blocking::spi::Transactional<W>` for implementers of
+    /// `spi::Write<W>` and `spi::Transfer<W>`
+    pub trait Default<W, E> {}
+
+    impl<W: 'static, E, S> super::Transactional<W> for S
+    where
+        S: self::Default<W, E> + Write<W, Error = E> + Transfer<W, Error = E>,
+        W: Copy + Clone,
+    {
+        type Error = E;
+
+        fn exec<'a>(&mut self, operations: &mut [super::Operation<'a, W>]) -> Result<(), E> {
+            for op in operations {
+                match op {
+                    Operation::Write(w) => self.write(w)?,
+                    Operation::Transfer(t) => self.transfer(t).map(|_| ())?,
+                }
+            }
+
+            Ok(())
+        }
+    }
+}
