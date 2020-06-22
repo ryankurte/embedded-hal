@@ -5,10 +5,18 @@
 //! Operations on 10-bit slave addresses are not supported by the API yet (but applications might
 //! be able to emulate some operations).
 
+
+/// Generic I2C error trait
+pub trait I2cError {
+    /// Check if the error is a bus NACK
+    fn is_nack(&self) -> bool;
+}
+
+
 /// Blocking read
 pub trait Read {
     /// Error type
-    type Error;
+    type Error: I2cError;
 
     /// Reads enough bytes from slave with `address` to fill `buffer`
     ///
@@ -34,7 +42,7 @@ pub trait Read {
 /// Blocking write
 pub trait Write {
     /// Error type
-    type Error;
+    type Error: I2cError;
 
     /// Sends bytes to slave with address `address`
     ///
@@ -58,7 +66,7 @@ pub trait Write {
 /// Blocking write (iterator version)
 pub trait WriteIter {
     /// Error type
-    type Error;
+    type Error: I2cError;
 
     /// Sends bytes to slave with address `address`
     ///
@@ -73,7 +81,7 @@ pub trait WriteIter {
 /// Blocking write + read
 pub trait WriteRead {
     /// Error type
-    type Error;
+    type Error: I2cError;
 
     /// Sends bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
     /// single transaction*
@@ -108,7 +116,7 @@ pub trait WriteRead {
 /// Blocking write (iterator version) + read
 pub trait WriteIterRead {
     /// Error type
-    type Error;
+    type Error: I2cError;
 
     /// Sends bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
     /// single transaction*
