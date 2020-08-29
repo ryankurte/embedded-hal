@@ -29,6 +29,12 @@ pub trait WriteIter<W> {
         WI: IntoIterator<Item = W>;
 }
 
+/// ManagedCS marker trait specifies that all `spi` operations will be preceded by
+/// asserting the CS pin, and followed by de-asserting the CS pin.
+///
+/// TODO: document wrappers that can be used where this is required
+pub trait ManagedCs {}
+
 /// Blocking transfer
 pub mod transfer {
     /// Default implementation of `blocking::spi::Transfer<W>` for implementers of
