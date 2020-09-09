@@ -112,11 +112,11 @@ pub mod write_iter {
 /// Provides SpiWithCS wrapper around an spi::* and OutputPin impl
 pub mod spi_with_cs {
 
-    use core::marker::PhantomData;
     use core::fmt::Debug;
+    use core::marker::PhantomData;
 
-    use crate::digital::OutputPin;
     use super::*;
+    use crate::digital::OutputPin;
 
     /// SpiWithCS wraps an blocking::spi* implementation with Chip Select (CS)
     /// pin management.
@@ -139,17 +139,22 @@ pub mod spi_with_cs {
     }
 
     /// ManagedCS marker trait indicates Chip Select management is automatic
-    impl <Spi, SpiError, Pin, PinError> ManagedCs for SpiWithCs <Spi, SpiError, Pin, PinError> {}
-    
-    impl <Spi, SpiError, Pin, PinError> SpiWithCs <Spi, SpiError, Pin, PinError> 
+    impl<Spi, SpiError, Pin, PinError> ManagedCs for SpiWithCs<Spi, SpiError, Pin, PinError> {}
+
+    impl<Spi, SpiError, Pin, PinError> SpiWithCs<Spi, SpiError, Pin, PinError>
     where
-        Pin: crate::digital::OutputPin<Error=PinError>,
+        Pin: crate::digital::OutputPin<Error = PinError>,
         SpiError: Debug,
         PinError: Debug,
     {
         /// Create a new SpiWithCS wrapper with the provided Spi and Pin
         pub fn new(spi: Spi, cs: Pin) -> Self {
-            Self{spi, cs, _spi_err: PhantomData, _pin_err: PhantomData}
+            Self {
+                spi,
+                cs,
+                _spi_err: PhantomData,
+                _pin_err: PhantomData,
+            }
         }
 
         /// Fetch references to the inner Spi and Pin types.
@@ -159,10 +164,10 @@ pub mod spi_with_cs {
         }
     }
 
-    impl <Spi, SpiError, Pin, PinError> Transfer<u8> for SpiWithCs<Spi, SpiError, Pin, PinError> 
-    where 
-        Spi: Transfer<u8, Error=SpiError>,
-        Pin: OutputPin<Error=PinError>,
+    impl<Spi, SpiError, Pin, PinError> Transfer<u8> for SpiWithCs<Spi, SpiError, Pin, PinError>
+    where
+        Spi: Transfer<u8, Error = SpiError>,
+        Pin: OutputPin<Error = PinError>,
         SpiError: Debug,
         PinError: Debug,
     {
@@ -184,10 +189,10 @@ pub mod spi_with_cs {
         }
     }
 
-    impl <Spi, SpiError, Pin, PinError> Write<u8> for SpiWithCs<Spi, SpiError, Pin, PinError> 
-    where 
-        Spi: Write<u8, Error=SpiError>,
-        Pin: OutputPin<Error=PinError>,
+    impl<Spi, SpiError, Pin, PinError> Write<u8> for SpiWithCs<Spi, SpiError, Pin, PinError>
+    where
+        Spi: Write<u8, Error = SpiError>,
+        Pin: OutputPin<Error = PinError>,
         SpiError: Debug,
         PinError: Debug,
     {
@@ -209,10 +214,10 @@ pub mod spi_with_cs {
         }
     }
 
-    impl <Spi, SpiError, Pin, PinError> WriteIter<u8> for SpiWithCs<Spi, SpiError, Pin, PinError> 
-    where 
-        Spi: WriteIter<u8, Error=SpiError>,
-        Pin: OutputPin<Error=PinError>,
+    impl<Spi, SpiError, Pin, PinError> WriteIter<u8> for SpiWithCs<Spi, SpiError, Pin, PinError>
+    where
+        Spi: WriteIter<u8, Error = SpiError>,
+        Pin: OutputPin<Error = PinError>,
         SpiError: Debug,
         PinError: Debug,
     {
@@ -221,7 +226,7 @@ pub mod spi_with_cs {
         /// Attempt an SPI write_iter with automated CS assert/deassert
         fn try_write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
         where
-            WI: IntoIterator<Item = u8>
+            WI: IntoIterator<Item = u8>,
         {
             // First assert CS
             self.cs.try_set_low().map_err(SpiWithCsErr::Pin)?;
@@ -237,5 +242,3 @@ pub mod spi_with_cs {
         }
     }
 }
-
-
