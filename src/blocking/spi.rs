@@ -115,7 +115,7 @@ pub mod spi_with_cs {
     use core::fmt::Debug;
     use core::marker::PhantomData;
 
-    use super::*;
+    use super::{Transfer, Write, WriteIter, ManagedCs};
     use crate::digital::OutputPin;
 
     /// SpiWithCS wraps an blocking::spi* implementation with Chip Select (CS)
@@ -129,9 +129,9 @@ pub mod spi_with_cs {
         _pin_err: PhantomData<PinError>,
     }
 
-    /// SpiWithCsErr provies an error numberation over generic Spi and Pin variants
+    /// SpiWithCsError provies an error numberation over generic Spi and Pin variants
     #[derive(Clone, Debug, PartialEq)]
-    pub enum SpiWithCsErr<SpiError, PinError> {
+    pub enum SpiWithCsError<SpiError, PinError> {
         /// Underlying SPI error
         Spi(SpiError),
         /// Underlying Pin error
@@ -162,6 +162,11 @@ pub mod spi_with_cs {
         pub fn inner(&mut self) -> (&mut Spi, &mut Pin) {
             (&mut self.spi, &mut self.cs)
         }
+
+        /// Destroy the SpiWithCs wrapper, returning the bus and pin objects
+        pub fn destroy(self) -> (Spi, Pin) {
+            (self.spi, self.cs)
+        }
     }
 
     impl<Spi, SpiError, Pin, PinError> Transfer<u8> for SpiWithCs<Spi, SpiError, Pin, PinError>
@@ -171,21 +176,21 @@ pub mod spi_with_cs {
         SpiError: Debug,
         PinError: Debug,
     {
-        type Error = SpiWithCsErr<SpiError, PinError>;
+        type Error = SpiWithCsError<SpiError, PinError>;
 
         /// Attempt an SPI transfer with automated CS assert/deassert
         fn try_transfer<'w>(&mut self, data: &'w mut [u8]) -> Result<&'w [u8], Self::Error> {
             // First assert CS
-            self.cs.try_set_low().map_err(SpiWithCsErr::Pin)?;
+            self.cs.try_set_low().map_err(SpiWithCsError::Pin)?;
 
             // Attempt the transfer, storing the result for later
-            let spi_res = self.spi.try_transfer(data).map_err(SpiWithCsErr::Spi);
+            let spi_result = self.spi.try_transfer(data).map_err(SpiWithCsError::Spi);
 
             // Deassert CS
-            self.cs.try_set_high().map_err(SpiWithCsErr::Pin)?;
+            self.cs.try_set_high().map_err(SpiWithCsError::Pin)?;
 
             // Return failures
-            spi_res
+            spi_result
         }
     }
 
@@ -196,21 +201,21 @@ pub mod spi_with_cs {
         SpiError: Debug,
         PinError: Debug,
     {
-        type Error = SpiWithCsErr<SpiError, PinError>;
+        type Error = SpiWithCsError<SpiError, PinError>;
 
         /// Attempt an SPI write with automated CS assert/deassert
         fn try_write<'w>(&mut self, data: &'w [u8]) -> Result<(), Self::Error> {
             // First assert CS
-            self.cs.try_set_low().map_err(SpiWithCsErr::Pin)?;
+            self.cs.try_set_low().map_err(SpiWithCsError::Pin)?;
 
             // Attempt the transfer, storing the result for later
-            let spi_res = self.spi.try_write(data).map_err(SpiWithCsErr::Spi);
+            let spi_result = self.spi.try_write(data).map_err(SpiWithCsError::Spi);
 
             // Deassert CS
-            self.cs.try_set_high().map_err(SpiWithCsErr::Pin)?;
+            self.cs.try_set_high().map_err(SpiWithCsError::Pin)?;
 
             // Return failures
-            spi_res
+            spi_result
         }
     }
 
@@ -221,7 +226,7 @@ pub mod spi_with_cs {
         SpiError: Debug,
         PinError: Debug,
     {
-        type Error = SpiWithCsErr<SpiError, PinError>;
+        type Error = SpiWithCsError<SpiError, PinError>;
 
         /// Attempt an SPI write_iter with automated CS assert/deassert
         fn try_write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
@@ -229,16 +234,16 @@ pub mod spi_with_cs {
             WI: IntoIterator<Item = u8>,
         {
             // First assert CS
-            self.cs.try_set_low().map_err(SpiWithCsErr::Pin)?;
+            self.cs.try_set_low().map_err(SpiWithCsError::Pin)?;
 
             // Attempt the transfer, storing the result for later
-            let spi_res = self.spi.try_write_iter(words).map_err(SpiWithCsErr::Spi);
+            let spi_result = self.spi.try_write_iter(words).map_err(SpiWithCsError::Spi);
 
             // Deassert CS
-            self.cs.try_set_high().map_err(SpiWithCsErr::Pin)?;
+            self.cs.try_set_high().map_err(SpiWithCsError::Pin)?;
 
             // Return failures
-            spi_res
+            spi_result
         }
     }
 }
