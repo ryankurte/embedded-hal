@@ -120,7 +120,7 @@ pub mod spi_with_cs {
 
     /// SpiWithCS wraps an blocking::spi* implementation with Chip Select (CS)
     /// pin management.
-    /// For sharing SPI between peripherals, see [shared-bus]()
+    /// For sharing SPI between peripherals, see [shared-bus](https://crates.io/crates/shared-bus)
     pub struct SpiWithCs<Spi, SpiError, Pin, PinError> {
         spi: Spi,
         cs: Pin,
@@ -129,12 +129,12 @@ pub mod spi_with_cs {
         _pin_err: PhantomData<PinError>,
     }
 
-    /// SpiWithCsError provies an error numberation over generic Spi and Pin variants
+    /// Underlying causes for errors. Either SPI communication or CS pin state setting error
     #[derive(Clone, Debug, PartialEq)]
     pub enum SpiWithCsError<SpiError, PinError> {
-        /// Underlying SPI error
+        /// Underlying SPI communication error
         Spi(SpiError),
-        /// Underlying Pin error
+        /// Underlying chip-select pin state setting error
         Pin(PinError),
     }
 
