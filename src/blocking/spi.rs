@@ -115,7 +115,7 @@ pub mod spi_with_cs {
     use core::fmt::Debug;
     use core::marker::PhantomData;
 
-    use super::{Transfer, Write, WriteIter, ManagedCs};
+    use super::{ManagedCs, Transfer, Write, WriteIter};
     use crate::digital::OutputPin;
 
     /// SpiWithCS wraps an blocking::spi* implementation with Chip Select (CS)
